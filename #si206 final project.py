@@ -8,6 +8,8 @@ import sqlite3
 import unittest
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+import lyricsgenius
+
 
 
 #beautiful soup portion 
