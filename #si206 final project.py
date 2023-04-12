@@ -8,7 +8,6 @@ import sqlite3
 import unittest
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-import lyricsgenius
 
 
 import requests
@@ -32,7 +31,6 @@ def parse_web_with_soup(website):
     for row in rows:
       cols = row.find_all('td')
       artist = cols[2].text.strip()
-      artist = artist.re
       streams = cols[3].text.strip()
       artist_streams.append((artist, streams))
 
@@ -54,16 +52,32 @@ def parse_web_with_soup(website):
 
 
 #get top 10 artists 
-#for track in results['tracks'][:10]:
-    #print('track    : ' + track['name'])
+
+
 
 
 #get their total spotify streams 
 
+#get top 10 songs
+def top_ten_songs(top10_artists):
+    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id="YOUR_APP_CLIENT_ID",
+                                            client_secret="YOUR_APP_CLIENT_SECRET",
+                                            redirect_uri="YOUR_APP_REDIRECT_URI",
+                                            scope="user-library-read"))
+    top10_songs = []
+    for artist in top10_artists:
+        response = sp.artist_top_tracks(artist)
+        for track in response['tracks']:
+            song_names = track['name']
+            top10_songs.append(song_names)
+    all_top_songs = top10_songs[:100]
+
+    print(all_top_songs)
+
 
 def main():
-    parse_web_with_soup("https://chartmasters.org/most-streamed-artists-ever-on-spotify/")
-
+    top_artists = parse_web_with_soup("https://chartmasters.org/most-streamed-artists-ever-on-spotify/")
+    top_ten_songs(top_artists)
 
 
 if __name__ == '__main__':
