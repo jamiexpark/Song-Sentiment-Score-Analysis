@@ -28,11 +28,19 @@ def parse_web_with_soup(website):
     artist_streams = []
 
 # Loop through each row and extract the artist and their total streams
-    for row in rows:
+    counter = 0
+    for row in rows :
+      if counter == 10:
+        break
       cols = row.find_all('td')
-      artist = cols[2].text.strip()
+      artist = cols[2].contents
+      artist = artist[0].contents
+      artist = artist[0].contents
+   
       streams = cols[3].text.strip()
       artist_streams.append((artist, streams))
+      counter += 1
+
 
 
     top10_artists = artist_streams[:10]
