@@ -33,7 +33,8 @@ def parse_web_with_soup(website):
 
 
 #get top 10 artists 
-
+#for track in results['tracks'][:10]:
+    #print('track    : ' + track['name'])
 
 
 #get their total spotify streams 
