@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 import os
 import sqlite3
 import unittest
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+
 
 #beautiful soup portion 
 def parse_web_with_soup(website):
@@ -28,7 +31,6 @@ def parse_web_with_soup(website):
 
 
 #get top 10 artists 
-
 
 
 
