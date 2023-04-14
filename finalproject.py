@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import os
 import sqlite3
 import unittest
-
 import sys
 import json
 import spotipy
@@ -62,22 +61,12 @@ def parse_web_with_soup(website):
 
 #get their total spotify streams 
 
-#authorize to use spotipy
-username = sys.argv[1]
+#get top 10 songs
 
-# user ID: 3e095d13230742a7
-
-try:
-    token = util.prompt_for_user_token(username)
-except:
-    os.remove(f".cache-{username}")
-    token = util.prompt_for_user_token(username)
-
-spotifyObject = spotipy.Spotify(auth=token)
 
 def main():
     top_artists = parse_web_with_soup("https://chartmasters.org/most-streamed-artists-ever-on-spotify/")
-
+    
 
 
 if __name__ == '__main__':
