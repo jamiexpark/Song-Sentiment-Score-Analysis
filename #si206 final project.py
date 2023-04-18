@@ -9,10 +9,18 @@ import unittest
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from lyricsgenius import Genius
-from transformers import pipeline
+# from transformers import pipeline
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 # import torch
 
+conn = sqlite3.connect('music.db')
+
+c = conn.cursor()
+
+c.execute("""CREATE TABLE IF NOT EXISTS artists(
+            name TEXT,
+            streams TEXT
+            )""")
 
 import requests
 
@@ -48,9 +56,17 @@ def parse_web_with_soup(website):
 
 
     top10_artists = artist_streams[:10]
+    new_list = []
+    for artist in top10_artists:
+        new_tuple = (','.join(artist[0]), artist[1])
+        new_list.append(new_tuple)
 
+    c.executemany("INSERT INTO artists VALUES (?, ?)", new_list)
 
-    return top10_artists
+    conn.commit()
+    conn.close()
+
+    return new_list
 
 
 
@@ -189,7 +205,13 @@ def top_song_verses(top_10_songs):
     for song in drake_list:
         artist = genius.search_artist("Drake", max_songs=0)
         song1 = genius.search_song(song, artist.name)
-        drake_lyric_list.append(song1.lyrics)
+        lyrics = song1.lyrics
+        # clean_lyrics = re.sub(r'^.*?(?=\n\n)|\\n|Translations.*$|\d+', '', lyrics, flags=re.DOTALL)
+        clean_lyrics = lyrics.replace("\n", " ")
+        clean_lyrics = clean_lyrics.replace("Embed", "")
+        clean_lyrics = clean_lyrics.replace("\\", "")
+        drake_lyric_list.append(clean_lyrics)
+    
     print(drake_lyric_list)
     # for song in bad_bunny_list:
     #     artist = genius.search_artist("Bad Bunny", max_songs=0)
@@ -246,9 +268,10 @@ def top_song_verses(top_10_songs):
 def main():
     top_artists = parse_web_with_soup("https://chartmasters.org/most-streamed-artists-ever-on-spotify/")
     print(top_artists)
-    top_songs = top_ten_songs(top_artists)
+    # top_artists
+    # top_songs = top_ten_songs(top_artists)
     # print(top_songs)
-    top_song_verses(top_songs)
+    # top_song_verses(top_songs)
 
 
 
