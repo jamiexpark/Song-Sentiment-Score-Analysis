@@ -100,13 +100,14 @@ def parse_web_with_soup(website):
 #get top 10 artists 
 
 #get top 10 songs
-def top_ten_songs(top10_artists):
+def top_ten_songs(artist_streams):
     sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id='298e33767b2644d58fe23abb08548375',
                                                            client_secret='d71c51c82f9d4320b29b9625e5a83f77'))
     
+    top10_artists = artist_streams[:10]
     names_only = []
     for item in top10_artists:
-        name = item[0][0]
+        name = item[0]
         names_only.append((name))
 
 
@@ -131,6 +132,25 @@ def top_ten_songs(top10_artists):
         top10_by_artist.append((names_only[i], indiv_top10_songs[i]))
 
     return top10_by_artist
+
+def related_artists(artist_streams):
+    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id='298e33767b2644d58fe23abb08548375',
+                                                           client_secret='d71c51c82f9d4320b29b9625e5a83f77'))
+    
+    top10_artists = artist_streams[:10]
+    names_only = []
+    for item in top10_artists:
+        name = item[0]
+        names_only.append((name))
+
+    list_artist = ('3TVXtAsR1Inumwj472S9r4','4q3ewBCX7sLwd24euuV69X','06HL4z0CvFAxyc27GXpf02','6eUKZXaKkcviH0Ku9w2n3V','1Xyo4u8uXC1ZmMpatF05PJ','1uNFoZAHBGtllmzznpCI3s','66CXWjxzNUsdJxJ2JdwvnR','7dGJo4pcD2V6oG8kP0tJRR','3Nrfpe0tUJi4K4DXYWgMUX','246dkjvS1zLTtiykXe5h60')
+ 
+ #related artists
+    for artist_name in list_artist:
+        re = sp.artist_related_artists(artist_name)
+        print('Related artists for', artist_name)
+        for artist in re['artists']:
+            print('  ', artist['name'])
 
 
 def top_song_verses(top_10_songs):
@@ -287,9 +307,8 @@ def main():
     top_artists = parse_web_with_soup("https://chartmasters.org/most-streamed-artists-ever-on-spotify/")
     print(top_artists)
     # top_artists
-    # top_songs = top_ten_songs(top_artists)
-    # print(top_songs)
-    # top_song_verses(top_songs)
+    top_songs = top_ten_songs(top_artists)
+    print(top_songs)
 
 
 
