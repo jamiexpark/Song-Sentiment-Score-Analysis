@@ -40,33 +40,49 @@ def parse_web_with_soup(website):
     artist_streams = []
 
 # Loop through each row and extract the artist and their total streams
+    # counter = 0
+    # for row in rows :
+    #   if counter == 10:
+    #     break
+    #   cols = row.find_all('td')
+    #   artist = cols[2].contents
+    #   artist = artist[0].contents
+    #   artist = artist[0].contents
+   
+    #   streams = cols[3].text.strip()
+    #   artist_streams.append((artist, streams))
+    #   counter += 1
     counter = 0
     for row in rows :
-      if counter == 10:
+      if counter == 100:
         break
       cols = row.find_all('td')
       artist = cols[2].contents
-      artist = artist[0].contents
-      artist = artist[0].contents
-   
+      artist = artist[0]
+      artist = str(artist)
+
+      regex_pattern_1 = r'<b>(.*?)<\/b>'
+      regex_pattern_2 = r'<a[^>]*>(.*?)<\/a>'
+
+      match_1 = re.search(regex_pattern_1, artist)
+      if match_1:
+        artist = match_1.group(1)
+
+      match_2 = re.search(regex_pattern_2, artist)
+      if match_2:
+        artist = match_2.group(1)
+
+
       streams = cols[3].text.strip()
       artist_streams.append((artist, streams))
       counter += 1
 
-
-
-    top10_artists = artist_streams[:10]
-    new_list = []
-    for artist in top10_artists:
-        new_tuple = (','.join(artist[0]), artist[1])
-        new_list.append(new_tuple)
-
-    c.executemany("INSERT INTO artists VALUES (?, ?)", new_list)
+    c.executemany("INSERT INTO artists VALUES (?, ?)", artist_streams)
 
     conn.commit()
     conn.close()
 
-    return new_list
+    return artist_streams
 
 
 
