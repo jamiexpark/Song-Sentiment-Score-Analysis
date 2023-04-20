@@ -322,12 +322,10 @@ def top_song_verses(top_10_songs):
 
 
     conn.commit()
-    conn.close()
     # print(drake_lyric_list)
 
     
   #artist name vs number of streams bargraph 
-    conn = sqlite3.connect('music.db')
     c = conn.cursor()
 
 
