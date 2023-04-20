@@ -16,13 +16,23 @@ import requests
 
 conn = sqlite3.connect('music.db')
 
-# c = conn.cursor()
+c = conn.cursor()
 
 # c.execute("""CREATE TABLE IF NOT EXISTS artists(
 #             name TEXT,
 #             streams TEXT,
 #             UNIQUE(name, streams)
 #             )""")
+
+c.execute('''CREATE TABLE IF NOT EXISTS songs 
+             (artist TEXT, song1 TEXT, song2 TEXT, song3 TEXT, song4 TEXT, song5 TEXT, 
+             song6 TEXT, song7 TEXT, song8 TEXT, song9 TEXT, song10 TEXT)''')
+
+c.execute('''CREATE TABLE IF NOT EXISTS top_songs
+             (artist_id INTEGER, song TEXT)''')
+
+c.execute('''CREATE TABLE IF NOT EXISTS related_artists
+             (id INTEGER PRIMARY KEY, artist TEXT, related_artist TEXT)''')
 
 
 
@@ -136,6 +146,15 @@ def top_ten_songs(artist_streams):
     for i in range(len(names_only)):
         top10_by_artist.append((names_only[i], indiv_top10_songs[i]))
 
+    for artist_name, title in top10_by_artist:
+        c.execute("INSERT INTO songs (artist, song1, song2, song3, song4, song5, song6, song7, song8, song9, song10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+              (artist_name, *title))
+        
+    for i, (name_artist, song_title) in enumerate(top10_by_artist, start=1):
+        for song in song_title:
+            c.execute("INSERT INTO top_songs (artist_id, song) VALUES (?, ?)", (i, song))
+
+
     return top10_by_artist
 
 def related_artists(artist_streams):
@@ -151,11 +170,31 @@ def related_artists(artist_streams):
     list_artist = ('3TVXtAsR1Inumwj472S9r4','4q3ewBCX7sLwd24euuV69X','06HL4z0CvFAxyc27GXpf02','6eUKZXaKkcviH0Ku9w2n3V','1Xyo4u8uXC1ZmMpatF05PJ','1uNFoZAHBGtllmzznpCI3s','66CXWjxzNUsdJxJ2JdwvnR','7dGJo4pcD2V6oG8kP0tJRR','3Nrfpe0tUJi4K4DXYWgMUX','246dkjvS1zLTtiykXe5h60')
  
  #related artists
+    r = []
     for artist_name in list_artist:
         re = sp.artist_related_artists(artist_name)
-        print('Related artists for', artist_name)
-        for artist in re['artists']:
-            print('  ', artist['name'])
+        for name in re['artists'][:20]:
+            artist = name['name']
+            r.append(artist)
+
+    related_per_artist = []
+    for i in range(0, len(r), 20):
+        group = r[i:i + 20]
+        related_per_artist.append(tuple(group))
+
+    top_related = []
+    for i in range(len(names_only)):
+        top_related.append((names_only[i], related_per_artist[i]))
+
+    for artist_id, (artist, related) in enumerate(top_related, start=1):
+        for name_artist in related:
+            c.execute("INSERT INTO related_artists (artist_id, artist, related_artist) VALUES (?, ?, ?)",
+                    (artist_id, artist, name_artist))
+    
+    conn.commit()
+    conn.close()
+
+    return top_related
 
 
 # c.execute("""CREATE TABLE IF NOT EXISTS sentiments(
@@ -341,7 +380,7 @@ def top_song_verses(top_10_songs):
     ax.bar(artists, streams)
 
     ax.set_xlabel('Artist Name')
-        ax.set_ylabel('Streams')
+    ax.set_ylabel('Streams')
     ax.set_title('Top Artists by Streams')
 
     plt.xticks(rotation=45, ha='right')
