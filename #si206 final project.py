@@ -325,6 +325,30 @@ def top_song_verses(top_10_songs):
     conn.close()
     # print(drake_lyric_list)
 
+    
+  #artist name vs number of streams bargraph 
+    conn = sqlite3.connect('music.db')
+    c = conn.cursor()
+
+
+    c.execute("SELECT name, streams FROM artists")
+    data = c.fetchall()
+    artists = []
+    streams = []
+    for row in data[:15]:
+      artists.append(row[0])
+      streams.append(int(row[1].replace(',', ''))) 
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.bar(artists, streams)
+
+    ax.set_xlabel('Artist Name')
+        ax.set_ylabel('Streams')
+    ax.set_title('Top Artists by Streams')
+
+    plt.xticks(rotation=45, ha='right')
+    plt.show()
+    conn.close()
 
 
 def main():
