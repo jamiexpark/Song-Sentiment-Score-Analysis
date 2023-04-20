@@ -12,17 +12,19 @@ from lyricsgenius import Genius
 # from transformers import pipeline
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 # import torch
+import requests
 
 conn = sqlite3.connect('music.db')
 
-c = conn.cursor()
+# c = conn.cursor()
 
-c.execute("""CREATE TABLE IF NOT EXISTS artists(
-            name TEXT,
-            streams TEXT
-            )""")
+# c.execute("""CREATE TABLE IF NOT EXISTS artists(
+#             name TEXT,
+#             streams TEXT,
+#             UNIQUE(name, streams)
+#             )""")
 
-import requests
+
 
 #beautiful soup portion 
 def parse_web_with_soup(website):
@@ -76,11 +78,16 @@ def parse_web_with_soup(website):
       streams = cols[3].text.strip()
       artist_streams.append((artist, streams))
       counter += 1
-
-    c.executemany("INSERT INTO artists VALUES (?, ?)", artist_streams)
-
+      
+    c = conn.cursor()
+    c.execute("""CREATE TABLE IF NOT EXISTS artists(
+            name TEXT,
+            streams TEXT,
+            UNIQUE(name, streams)
+            )""")
+    c.executemany("INSERT OR IGNORE INTO artists VALUES (?, ?)", artist_streams)
     conn.commit()
-    conn.close()
+    # conn.close()
 
     return artist_streams
 
@@ -150,6 +157,11 @@ def related_artists(artist_streams):
         for artist in re['artists']:
             print('  ', artist['name'])
 
+
+# c.execute("""CREATE TABLE IF NOT EXISTS sentiments(
+#             song TEXT,
+#             sentiment_score TEXT
+#             )""")
 
 def top_song_verses(top_10_songs):
     api_key = "DtKTvEx0TjZXb3MJt0DIY_6HmKi-jSrCMuYngYO1LJpk0UTlGdOGBgjiEokMruJz"
@@ -296,17 +308,32 @@ def top_song_verses(top_10_songs):
    
     # print(sentiment_pipeline(drake_lyric_list))
     # sentiment_pipeline(drake_lyric_list)
+    drake_sent = []
     for drake_song in drake_lyric_list:
-        print(sentiment.polarity_scores(drake_song))
+        sents = sentiment.polarity_scores(drake_song)
+        drake_sent.append(sents['compound'])
+    drake_tups = list(zip(drake_list, drake_sent))
+    c = conn.cursor()
+    c.execute("""CREATE TABLE IF NOT EXISTS sentiments(
+            song TEXT,
+            sentiment_score TEXT
+            )""")
+    c.executemany("INSERT INTO sentiments VALUES (?, ?)", drake_tups)
+
+
+    conn.commit()
+    conn.close()
     # print(drake_lyric_list)
+
 
 
 def main():
     top_artists = parse_web_with_soup("https://chartmasters.org/most-streamed-artists-ever-on-spotify/")
-    print(top_artists)
+    # print(top_artists)
     # top_artists
     top_songs = top_ten_songs(top_artists)
-    print(top_songs)
+    top_song_verses(top_songs)
+    # print(top_songs)
 
 
 
