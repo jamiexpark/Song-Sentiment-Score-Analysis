@@ -153,10 +153,19 @@ def top_ten_songs(artist_streams):
 
     c = conn.cursor()
 
+    c.execute('''CREATE TABLE IF NOT EXISTS songs (
+               id INTEGER PRIMARY KEY,
+               title TEXT UNIQUE)''')
+    for title in total_top10_songs:
+        try:
+            c.execute('INSERT INTO songs (title) VALUES (?)', (title,))
+        except sqlite3.IntegrityError:
+            continue
+    conn.commit()
+
     c.execute('''CREATE TABLE IF NOT EXISTS top_songs
-             (artist_id INTEGER, song TEXT)''')
-    
-    c.execute("SELECT COUNT(*) FROM top_songs")
+             (artist_id INTEGER, song_id INTEGER, FOREIGN KEY(song_id) REFERENCES songs(id))''')
+    c.execute('SELECT COUNT(*) FROM top_songs')
     row_count = c.fetchone()[0]
     print(row_count)
 
@@ -165,45 +174,64 @@ def top_ten_songs(artist_streams):
     else:
         if row_count == 0:
             for song in drake_10[0][1]:
-                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (1, song))
+                c.execute('SELECT id FROM songs WHERE title = ?', (song,))
+                song_id = c.fetchone()[0]
+                conn.execute('INSERT INTO top_songs (artist_id, song_id) VALUES (?, ?)', (1, song_id))
             conn.commit()
         elif row_count == 10:
             for song in bunny_10[0][1]:
-                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (2, song))
+                c.execute('SELECT id FROM songs WHERE title = ?', (song,))
+                song_id = c.fetchone()[0]
+                conn.execute('INSERT INTO top_songs (artist_id, song_id) VALUES (?, ?)', (2, song_id))
             conn.commit()
         elif row_count == 20:
             for song in swift_10[0][1]:
-                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (3, song))
+                c.execute('SELECT id FROM songs WHERE title = ?', (song,))
+                song_id = c.fetchone()[0]
+                conn.execute('INSERT INTO top_songs (artist_id, song_id) VALUES (?, ?)', (3, song_id))
             conn.commit()
         elif row_count == 30:
             for song in weeknd_10[0][1]:
-                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (4, song))
+                c.execute('SELECT id FROM songs WHERE title = ?', (song,))
+                song_id = c.fetchone()[0]
+                conn.execute('INSERT INTO top_songs (artist_id, song_id) VALUES (?, ?)', (4, song_id))
             conn.commit()
         elif row_count == 40:
             for song in sheeran_10[0][1]:
-                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (5, song))
+                c.execute('SELECT id FROM songs WHERE title = ?', (song,))
+                song_id = c.fetchone()[0]
+                conn.execute('INSERT INTO top_songs (artist_id, song_id) VALUES (?, ?)', (5, song_id))
             conn.commit()
         elif row_count == 50:
             for song in bieber_10[0][1]:
-                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (6, song))
+                c.execute('SELECT id FROM songs WHERE title = ?', (song,))
+                song_id = c.fetchone()[0]
+                conn.execute('INSERT INTO top_songs (artist_id, song_id) VALUES (?, ?)', (6, song_id))
             conn.commit()
         elif row_count == 60:
             for song in grande_10[0][1]:
-                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (7, song))
+                c.execute('SELECT id FROM songs WHERE title = ?', (song,))
+                song_id = c.fetchone()[0]
+                conn.execute('INSERT INTO top_songs (artist_id, song_id) VALUES (?, ?)', (7, song_id))
             conn.commit()
         elif row_count == 70:
             for song in eminem_10[0][1]:
-                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (8, song))
+                c.execute('SELECT id FROM songs WHERE title = ?', (song,))
+                song_id = c.fetchone()[0]
+                conn.execute('INSERT INTO top_songs (artist_id, song_id) VALUES (?, ?)', (8, song_id))
             conn.commit()
         elif row_count == 80:
             for song in bts_10[0][1]:
-                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (9, song))
+                c.execute('SELECT id FROM songs WHERE title = ?', (song,))
+                song_id = c.fetchone()[0]
+                conn.execute('INSERT INTO top_songs (artist_id, song_id) VALUES (?, ?)', (9, song_id))
             conn.commit()
         elif row_count == 90:
             for song in malone_10[0][1]:
-                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (10, song))
+                c.execute('SELECT id FROM songs WHERE title = ?', (song,))
+                song_id = c.fetchone()[0]
+                conn.execute('INSERT INTO top_songs (artist_id, song_id) VALUES (?, ?)', (10, song_id))
             conn.commit()
-    conn.close()
 
     return top10_by_artist
 
@@ -297,6 +325,7 @@ def top_song_verses(top_10_songs):
             index += 1
 
     c = conn.cursor()
+
     c.execute("""CREATE TABLE IF NOT EXISTS sentiments(
             song TEXT,
             sentiment_score TEXT
