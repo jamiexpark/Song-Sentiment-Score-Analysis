@@ -24,18 +24,6 @@ c = conn.cursor()
 #             UNIQUE(name, streams)
 #             )""")
 
-c.execute('''CREATE TABLE IF NOT EXISTS songs 
-             (artist TEXT, song1 TEXT, song2 TEXT, song3 TEXT, song4 TEXT, song5 TEXT, 
-             song6 TEXT, song7 TEXT, song8 TEXT, song9 TEXT, song10 TEXT)''')
-
-c.execute('''CREATE TABLE IF NOT EXISTS top_songs
-             (artist_id INTEGER, song TEXT)''')
-
-c.execute('''CREATE TABLE IF NOT EXISTS related_artists
-             (id INTEGER PRIMARY KEY, artist TEXT, related_artist TEXT)''')
-
-
-
 #beautiful soup portion 
 def parse_web_with_soup(website):
 
@@ -101,19 +89,6 @@ def parse_web_with_soup(website):
 
     return artist_streams
 
-
-
-#read in the soup 
-
-
-
-
-#read the website (chartmasters)
-
-
-
-#get top 10 artists 
-
 #get top 10 songs
 def top_ten_songs(artist_streams):
     sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id='298e33767b2644d58fe23abb08548375',
@@ -125,9 +100,7 @@ def top_ten_songs(artist_streams):
         name = item[0]
         names_only.append((name))
 
-
-    #need help getting artist id
-    list_artist = ('3TVXtAsR1Inumwj472S9r4','4q3ewBCX7sLwd24euuV69X','06HL4z0CvFAxyc27GXpf02','1Xyo4u8uXC1ZmMpatF05PJ', '6eUKZXaKkcviH0Ku9w2n3V', '1uNFoZAHBGtllmzznpCI3s','66CXWjxzNUsdJxJ2JdwvnR','7dGJo4pcD2V6oG8kP0tJRR','3Nrfpe0tUJi4K4DXYWgMUX','246dkjvS1zLTtiykXe5h60')
+    list_artist = ('3TVXtAsR1Inumwj472S9r4','4q3ewBCX7sLwd24euuV69X','06HL4z0CvFAxyc27GXpf02','1Xyo4u8uXC1ZmMpatF05PJ','6eUKZXaKkcviH0Ku9w2n3V','1uNFoZAHBGtllmzznpCI3s','66CXWjxzNUsdJxJ2JdwvnR','7dGJo4pcD2V6oG8kP0tJRR','3Nrfpe0tUJi4K4DXYWgMUX','246dkjvS1zLTtiykXe5h60')
 
     total_top10_songs = []
     indiv_top10_songs = []
@@ -143,17 +116,94 @@ def top_ten_songs(artist_streams):
         indiv_top10_songs.append(tuple(group))
     
     top10_by_artist = []
+    drake_10 = []
+    bunny_10 = []
+    swift_10 = []
+    weeknd_10 = []
+    sheeran_10 = []
+    grande_10 = []
+    bieber_10 = []
+    eminem_10 = []
+    bts_10 = []
+    malone_10 = []
+
     for i in range(len(names_only)):
         top10_by_artist.append((names_only[i], indiv_top10_songs[i]))
-
-    for artist_name, title in top10_by_artist:
-        c.execute("INSERT INTO songs (artist, song1, song2, song3, song4, song5, song6, song7, song8, song9, song10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-              (artist_name, *title))
         
-    for i, (name_artist, song_title) in enumerate(top10_by_artist, start=1):
-        for song in song_title:
-            c.execute("INSERT INTO top_songs (artist_id, song) VALUES (?, ?)", (i, song))
+        if i == 0:
+            drake_10.append((names_only[i], indiv_top10_songs[i]))
+        elif i ==1:
+            bunny_10.append((names_only[i], indiv_top10_songs[i]))
+        elif i == 2:
+            swift_10.append((names_only[i], indiv_top10_songs[i]))
+        elif i == 3:
+            weeknd_10.append((names_only[i], indiv_top10_songs[i]))
+        elif i == 4:
+            sheeran_10.append((names_only[i], indiv_top10_songs[i]))
+        elif i == 5:
+            grande_10.append((names_only[i], indiv_top10_songs[i]))
+        elif i == 6:
+            bieber_10.append((names_only[i], indiv_top10_songs[i]))
+        elif i == 7:
+            eminem_10.append((names_only[i], indiv_top10_songs[i]))
+        elif i == 8:
+            bts_10.append((names_only[i], indiv_top10_songs[i]))
+        elif i == 9:
+            malone_10.append((names_only[i], indiv_top10_songs[i]))
 
+    c = conn.cursor()
+
+    c.execute('''CREATE TABLE IF NOT EXISTS top_songs
+             (artist_id INTEGER, song TEXT)''')
+    
+    c.execute("SELECT COUNT(*) FROM top_songs")
+    row_count = c.fetchone()[0]
+    print(row_count)
+
+    if row_count == 100:
+        return
+    else:
+        if row_count == 0:
+            for song in drake_10[0][1]:
+                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (1, song))
+            conn.commit()
+        elif row_count == 10:
+            for song in bunny_10[0][1]:
+                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (2, song))
+            conn.commit()
+        elif row_count == 20:
+            for song in swift_10[0][1]:
+                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (3, song))
+            conn.commit()
+        elif row_count == 30:
+            for song in weeknd_10[0][1]:
+                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (4, song))
+            conn.commit()
+        elif row_count == 40:
+            for song in sheeran_10[0][1]:
+                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (5, song))
+            conn.commit()
+        elif row_count == 50:
+            for song in bieber_10[0][1]:
+                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (6, song))
+            conn.commit()
+        elif row_count == 60:
+            for song in grande_10[0][1]:
+                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (7, song))
+            conn.commit()
+        elif row_count == 70:
+            for song in eminem_10[0][1]:
+                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (8, song))
+            conn.commit()
+        elif row_count == 80:
+            for song in bts_10[0][1]:
+                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (9, song))
+            conn.commit()
+        elif row_count == 90:
+            for song in malone_10[0][1]:
+                conn.execute('INSERT INTO top_songs (artist_id, song) VALUES (?, ?)', (10, song))
+            conn.commit()
+    conn.close()
 
     return top10_by_artist
 
@@ -167,7 +217,7 @@ def related_artists(artist_streams):
         name = item[0]
         names_only.append((name))
 
-    list_artist = ('3TVXtAsR1Inumwj472S9r4','4q3ewBCX7sLwd24euuV69X','06HL4z0CvFAxyc27GXpf02','6eUKZXaKkcviH0Ku9w2n3V','1Xyo4u8uXC1ZmMpatF05PJ','1uNFoZAHBGtllmzznpCI3s','66CXWjxzNUsdJxJ2JdwvnR','7dGJo4pcD2V6oG8kP0tJRR','3Nrfpe0tUJi4K4DXYWgMUX','246dkjvS1zLTtiykXe5h60')
+    list_artist = ('3TVXtAsR1Inumwj472S9r4','4q3ewBCX7sLwd24euuV69X','06HL4z0CvFAxyc27GXpf02','1Xyo4u8uXC1ZmMpatF05PJ','6eUKZXaKkcviH0Ku9w2n3V','1uNFoZAHBGtllmzznpCI3s','66CXWjxzNUsdJxJ2JdwvnR','7dGJo4pcD2V6oG8kP0tJRR','3Nrfpe0tUJi4K4DXYWgMUX','246dkjvS1zLTtiykXe5h60') 
  
  #related artists
     r = []
@@ -186,13 +236,9 @@ def related_artists(artist_streams):
     for i in range(len(names_only)):
         top_related.append((names_only[i], related_per_artist[i]))
 
-    for artist_id, (artist, related) in enumerate(top_related, start=1):
-        for name_artist in related:
-            c.execute("INSERT INTO related_artists (artist_id, artist, related_artist) VALUES (?, ?, ?)",
-                    (artist_id, artist, name_artist))
-    
-    conn.commit()
-    conn.close()
+    #c = conn.cursor()
+    #c.execute('''CREATE TABLE IF NOT EXISTS related_artists
+            # (artist_id TEXT, related_artist_id TEXT)''')
 
     return top_related
 
