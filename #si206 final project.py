@@ -13,6 +13,7 @@ from lyricsgenius import Genius
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 # import torch
 import requests
+import visualtime
 
 conn = sqlite3.connect('music.db')
 
@@ -357,7 +358,7 @@ def top_song_verses(top_10_songs):
     post_sent = []
 
     if row_count == 100:
-        return
+        return top10_by_artist
     else:
         if row_count == 0:
             for song in drake_list:
