@@ -21,7 +21,7 @@ def my_func():
 def visualizations(conn):
     visual_one(conn)
     visual_two(conn)
-    # visual_three(conn)
+    visual_three(conn)
 
 def visual_one(conn):
     c = conn.cursor()
@@ -43,14 +43,9 @@ def visual_one(conn):
 
     plt.xticks(rotation=45, ha='right')
     plt.show()
-    #visualization2 sentiment score average
-
-
-
-
+ 
 def visual_two(conn):
     c = conn.cursor()
-
     c.execute("SELECT sentiment_score FROM sentiments")
     sentiment_scores = c.fetchall()
 
@@ -69,9 +64,9 @@ def visual_two(conn):
 
     c.execute("SELECT name FROM artists LIMIT 10")
     artist_names = c.fetchall()
-    meow = 1
- 
     artist_names = [name[0] for name in artist_names]
+    # avg_scores = [score[1] for score in avg_sentiment_scores]
+
 
     fig, ax = plt.subplots()
     ax.bar(artist_names, avg_sentiment_scores)  
@@ -81,12 +76,44 @@ def visual_two(conn):
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
     plt.show()
-    conn.close()
-
-
 
 def visual_three(conn):
     print("visual3")
+    c = conn.cursor()
+
+    c.execute("SELECT DISTINCT song, sentiment_score FROM sentiments ORDER BY sentiment_score DESC LIMIT 10")
+    top_songs = c.fetchall()
+    top_song_names = [row[0] for row in top_songs]
+    top_sentiment_scores = [float(row[1]) for row in top_songs]
+
+    c.execute("SELECT DISTINCT song, sentiment_score FROM sentiments ORDER BY sentiment_score ASC LIMIT 10")
+    bottom_songs = c.fetchall()
+    bottom_song_names = [row[0] for row in bottom_songs]
+    bottom_sentiment_scores = [float(row[1]) for row in bottom_songs]
+   
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+
+
+    ax1.set_xlabel('Songs with Highest Sentiment Scores')
+    ax1.set_ylabel('Sentiment Score')
+    ax1.set_ylim([0.9, 1.1])
+    ax1.set_yticks([0.9, 0.95, 1])  
+    ax1.set_yticklabels([0.9, 0.95, 1]) 
+    ax1.bar(top_song_names, top_sentiment_scores)
+   
+    ax2.set_xlabel('Songs with Lowest Sentiment Scores')
+    ax2.set_ylabel('Sentiment Score')
+    ax2.set_ylim([-1.1, 1.1]) 
+    ax2.set_yticks([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1]) 
+    ax2.set_yticklabels([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1])  
+    ax2.bar(bottom_song_names, bottom_sentiment_scores)
+
+    fig.suptitle('Sentiment Scores for Songs with Highest and Lowest Sentiment Scores')
+
+    plt.subplots_adjust(wspace=0.3)
+    plt.show()
+
+    conn.close()
 
 
 def visual_test(conn):
