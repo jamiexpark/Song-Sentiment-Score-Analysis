@@ -51,7 +51,6 @@ def visual_one(conn):
 def visual_two(conn):
     c = conn.cursor()
 
-    # c.execute("SELECT song, AVG(sentiment_score) as avg_sentiment_score FROM sentiments GROUP BY song ORDER BY song DESC LIMIT 100")
     c.execute("SELECT sentiment_score FROM sentiments")
     sentiment_scores = c.fetchall()
 
@@ -71,12 +70,9 @@ def visual_two(conn):
     c.execute("SELECT name FROM artists LIMIT 10")
     artist_names = c.fetchall()
     meow = 1
-    # Extract the song names and average sentiment scores from the fetched data
+ 
     artist_names = [name[0] for name in artist_names]
-    # avg_scores = [score[1] for score in avg_sentiment_scores]
 
-
-    # Create a bar chart to visualize the average sentiment scores
     fig, ax = plt.subplots()
     ax.bar(artist_names, avg_sentiment_scores)  
     ax.set_xlabel('Song')
@@ -85,8 +81,6 @@ def visual_two(conn):
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
     plt.show()
-
-    # Close the database connection
     conn.close()
 
 
@@ -97,18 +91,15 @@ def visual_three(conn):
 
 def visual_test(conn):
     c = conn.cursor()
-    # Fetch the sentiment scores for all songs
     c.execute("SELECT song, sentiment_score FROM sentiments")
     data = c.fetchall()
 
-    # Extract the song names and sentiment scores from the fetched data
     v_song = []
     v_sentiment_score = []
     for row in data:
         v_song.append(row[0])
         v_sentiment_score.append(float(row[1]))
 
-    # Create a bar chart to visualize the sentiment scores for all songs
     fig, ax = plt.subplots(figsize=(12, 6))
     ax.bar(v_song, v_sentiment_score)
 
