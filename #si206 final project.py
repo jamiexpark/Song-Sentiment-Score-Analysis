@@ -129,7 +129,6 @@ def top_ten_songs(artist_streams):
 
     for i in range(len(names_only)):
         top10_by_artist.append((names_only[i], indiv_top10_songs[i]))
-        
         if i == 0:
             drake_10.append((names_only[i], indiv_top10_songs[i]))
         elif i ==1:
@@ -170,7 +169,7 @@ def top_ten_songs(artist_streams):
     print(row_count)
 
     if row_count == 100:
-        return
+        return top10_by_artist
     else:
         if row_count == 0:
             for song in drake_10[0][1]:
@@ -232,43 +231,6 @@ def top_ten_songs(artist_streams):
                 song_id = c.fetchone()[0]
                 conn.execute('INSERT INTO top_songs (artist_id, song_id) VALUES (?, ?)', (10, song_id))
             conn.commit()
-
-    return top10_by_artist
-
-def related_artists(artist_streams):
-    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id='298e33767b2644d58fe23abb08548375',
-                                                           client_secret='d71c51c82f9d4320b29b9625e5a83f77'))
-    
-    top10_artists = artist_streams[:10]
-    names_only = []
-    for item in top10_artists:
-        name = item[0]
-        names_only.append((name))
-
-    list_artist = ('3TVXtAsR1Inumwj472S9r4','4q3ewBCX7sLwd24euuV69X','06HL4z0CvFAxyc27GXpf02','1Xyo4u8uXC1ZmMpatF05PJ','6eUKZXaKkcviH0Ku9w2n3V','1uNFoZAHBGtllmzznpCI3s','66CXWjxzNUsdJxJ2JdwvnR','7dGJo4pcD2V6oG8kP0tJRR','3Nrfpe0tUJi4K4DXYWgMUX','246dkjvS1zLTtiykXe5h60') 
- 
- #related artists
-    r = []
-    for artist_name in list_artist:
-        re = sp.artist_related_artists(artist_name)
-        for name in re['artists'][:20]:
-            artist = name['name']
-            r.append(artist)
-
-    related_per_artist = []
-    for i in range(0, len(r), 20):
-        group = r[i:i + 20]
-        related_per_artist.append(tuple(group))
-
-    top_related = []
-    for i in range(len(names_only)):
-        top_related.append((names_only[i], related_per_artist[i]))
-
-    #c = conn.cursor()
-    #c.execute('''CREATE TABLE IF NOT EXISTS related_artists
-            # (artist_id TEXT, related_artist_id TEXT)''')
-
-    return top_related
 
 def top_song_verses(top_10_songs):
     api_key = "DtKTvEx0TjZXb3MJt0DIY_6HmKi-jSrCMuYngYO1LJpk0UTlGdOGBgjiEokMruJz"
@@ -546,7 +508,7 @@ def main():
     # print(top_artists)
     # top_artists
     top_songs = top_ten_songs(top_artists)
-    # print(top_songs)
+    print(top_songs)
     top_song_verses(top_songs)
     # print(top_songs)
 
